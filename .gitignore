@@ -1,6 +1,10 @@
 # Python
-__pycache__
+**/__pycache__
 
 # Python virtual environments
-venv
-.venv
+**/venv
+**/.venv
+
+# IDEs
+**/.vscode
+**/.idea
