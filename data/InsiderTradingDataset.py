@@ -19,7 +19,7 @@ class InsiderTradingDataset(Dataset):
     def from_csv(self):
         pass
 
-class TestYFinDataset(unittest.TestCase):
+class TestInsiderTradingDataset(unittest.TestCase):
     
     # If not all abstract methods have been implemented, this will fail
     def test_constructor(self):
