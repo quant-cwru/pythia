@@ -4,7 +4,15 @@ from dataset import Dataset
 import unittest
 
 class InsiderTradingDataset(Dataset):
-    def __init__(self):
+    def __init__(self, source):
+        if source == 'litigations':
+            pass
+        elif source == 'insider-transactions':
+            pass
+        elif source == 'press-releases':
+            pass
+        else:
+            print("Invalid source.")
         pass
     
     def __getitem__(self, index):
