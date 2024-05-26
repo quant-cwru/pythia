@@ -4,6 +4,7 @@ import numpy as np
 
 class UnemploymentHistoricalDataset(Dataset):
   countries = ['colombia', 'new_zealand', 'united_kingdom', 'italy', 'luxembourg', 'euro_area19', 'sweden', 'oecd', 'south_africa', 'denmark', 'canada', 'switzerland', 'slovakia', 'hungary', 'portugal', 'spain', 'france', 'czech_republic', 'costa_rica', 'japan', 'slovenia', 'russia', 'austria', 'latvia', 'netherlands', 'israel', 'iceland', 'united_states', 'ireland', 'mexico', 'germany', 'greece', 'turkey', 'australia', 'poland', 'south_korea', 'chile', 'finland', 'european_union27_2020', 'norway', 'lithuania', 'euro_area20', 'estonia', 'belgium', 'brazil', 'indonesia', 'all']
+  
   def __init__(self, country, start_date=None, end_date=None, sex='total', age='total', seasonal_adjustment=False, frequency='monthly', seq_length=50, transform=None):
     """
     Intializes a dataset of unemployment rates for a given country.
