@@ -1,5 +1,8 @@
 import pandas as pd
+from torch.utils.data import Dataset
+import torch
 from platform.data.datasets.timeseries.StockHistorical import StockHistorical
+
 
 class DataProcessor:
     """
@@ -40,7 +43,21 @@ class DataProcessor:
         Returns a torch dataset (in tensors) from the corresponding features and labels.
         See https://pytorch.org/tutorials/beginner/basics/data_tutorial.html
         """
-        pass
+
+        #Custom torch class
+        class CustomTorchDataset(Dataset):
+            def __init__(self, dataframe):
+                self.data = dataframe
+
+            def __len__(self):
+                return len(self.data)
+
+            def __getitem__(self, idx):
+                return torch.tensor(self.data.iloc[idx].values, dtype=torch.float)
+
+        #Instantiates the torch class with the data and returns it
+        torchDataset = CustomTorchDataset(self.data.data)
+        return torchDataset
 
     def __getitem__(self, idx):
         return self.data[idx]
