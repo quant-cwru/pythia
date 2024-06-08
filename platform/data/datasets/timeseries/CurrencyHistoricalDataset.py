@@ -54,3 +54,4 @@ class CurrencyHistoricalDataset(Dataset):
       sample = self.transform(sample)
 
     return sample
+  
