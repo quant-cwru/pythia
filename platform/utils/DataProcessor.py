@@ -13,6 +13,8 @@ class DataProcessor:
     """
     def __init__(self, data : StockHistorical):
         self.data = data
+        self.features = None
+        self.labels = None
     
     def set_features(self, features : list):
         """
@@ -42,7 +44,14 @@ class DataProcessor:
         """
         Drops a column in the dataset. Should also drop the same column in its features and labels (if present).
         """
-        pass
+        if hasattr(self.data, "data_n"):
+            self.data.data_n.drop(columns=[col], inplace=True)
+        self.data.data.drop(columns=[col], inplace=True)
+
+        if self.features is not None and col in self.features.columns:
+            self.features.drop(columns=[col], inplace=True)
+        if self.labels is not None and col in self.labels.columns:
+            self.labels.drop(columns=[col], inplace=True)
 
     def plot(self, sample_idx = None):
         """
