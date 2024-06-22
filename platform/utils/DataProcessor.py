@@ -18,14 +18,25 @@ class DataProcessor:
         """
         Takes in a list of columns identified by their name and creates the respective feature subset.
         """
-        pass
+        if hasattr(self.data, "data_n"):
+            self.features = self.data.data_n[features]
+        else:
+            self.features = self.data.data[features]
     
     def set_labels(self, labels: list, shift=1):
         """
         Takes in a list of labels and creates the respective target subset.
         Since we are dealing with time-series data right now, the shift indicates how many timesteps ahead the labels are.
         """
-        pass
+        if hasattr(self.data, "data_n"):
+            data = self.data.data_n
+        else:
+            data = self.data.data
+
+        self.labels = data[labels].shift(-shift)
+
+        # Drop the last shift labels (nans)
+        self.labels = self.labels[:-shift]
 
     def drop(self, col: str):
         """
