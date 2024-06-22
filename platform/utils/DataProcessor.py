@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 from torch.utils.data import Dataset
 import torch
 from platform.data.datasets.timeseries.StockHistorical import StockHistorical
@@ -36,7 +37,39 @@ class DataProcessor:
         """
         Plots the input dataframe if no sample index is provided. Else plots the associated feature-target on a timeseries scale.
         """
-        pass
+        
+        if hasattr(self.data, "data_n"):
+            # Data is normalized, denormalize it
+            data = self.data.data_n
+            means = self.data.means
+            stds = self.data.stds
+
+            for c in data.columns:
+                data[c] = data[c] * stds[c] + means[c]
+        else:
+            # Data is unnormalized
+            data = self.data.data
+
+        if sample_idx is None:
+            # Plot the entire DataFrame
+            data.plot(figsize=(10, 6))
+            plt.title("Unnormalized Stock Prices")
+            plt.xlabel("Date")
+            plt.ylabel("Price")
+            plt.grid(True)
+            plt.show()
+        else:
+            if sample_idx < 0 or sample_idx >= len(self.data):
+                raise IndexError("Sample index out of range.")
+
+            # Plot the feature-target pair for the specified sample index
+            sample_data = data.iloc[sample_idx]
+            sample_data.plot(figsize=(10, 6))
+            plt.title(f"Unnormalized Data for Sample Index {sample_idx}")
+            plt.xlabel("Feature")
+            plt.ylabel("Value")
+            plt.grid(True)
+            plt.show()
 
     def to_torch(self):
         """
