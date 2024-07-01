@@ -1,9 +1,9 @@
 import yfinance as yf
 import pandas as pd
 import numpy as np
-from package.data.datasets.Dataset import Dataset
+from project.data.datasets.c_Dataset import c_Dataset
 
-class StockHistorical(Dataset):
+class StockHistorical(c_Dataset):
     def __init__(self, tickers, start_date=None, end_date=None, interval='1d'):
         self.data : pd.DataFrame = yf.download(tickers=tickers, interval=interval, start=start_date, end=end_date)
     

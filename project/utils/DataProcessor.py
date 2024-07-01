@@ -36,9 +36,12 @@ class DataProcessor:
             data = self.data.data
 
         self.labels = data[labels].shift(-shift)
-
-        # Drop the last shift labels (nans)
+        
+        # Remove NaN values
+        self.features = self.features[:-shift]
         self.labels = self.labels[:-shift]
+        self.labels = self.labels.dropna()
+        self.features = self.features.loc[self.labels.index]
 
     def drop(self, col: str):
         """
@@ -99,18 +102,18 @@ class DataProcessor:
 
         #Custom torch class
         class CustomTorchDataset(Dataset):
-            def __init__(self, dataframe):
-                self.data = dataframe
+            def __init__(self, features, labels):
+                self.features = torch.tensor(features.values, dtype=torch.float32)
+                self.labels = torch.tensor(labels.values, dtype=torch.float32)
 
             def __len__(self):
-                return len(self.data)
+                return len(self.features)
 
             def __getitem__(self, idx):
-                return torch.tensor(self.data.iloc[idx].values, dtype=torch.float)
+                return self.features[idx], self.labels[idx]
 
         #Instantiates the torch class with the data and returns it
-        torchDataset = CustomTorchDataset(self.data.data)
-        return torchDataset
+        return CustomTorchDataset(self.features, self.labels)
 
     def __getitem__(self, idx):
         return self.data[idx]
