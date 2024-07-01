@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from torch.utils.data import Dataset
 import torch
-from platform.data.datasets.timeseries.StockHistorical import StockHistorical
+from project.data.datasets.timeseries.StockHistorical import StockHistorical
 
 
 class DataProcessor:
