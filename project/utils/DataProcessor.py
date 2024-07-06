@@ -56,8 +56,12 @@ class DataProcessor:
         if self.labels is not None and col in self.labels.columns:
             self.labels.drop(columns=[col], inplace=True)
 
-    def plot(self, sample_idx=None):
+    def plot(self, feature_idx=None):
+        """
+        Plots the input dataframe if no sample index is provided. Else plots the associated feature-target on a timeseries scale.
+        """
         if hasattr(self.data, "data_n"):
+            # Data is normalized, denormalize it
             data = self.data.data_n.copy()
             means = self.data.data.mean()
             stds = self.data.data.std()
@@ -65,24 +69,39 @@ class DataProcessor:
             for c in data.columns:
                 data[c] = data[c] * stds[c] + means[c]
         else:
+            # Data is unnormalized
             data = self.data.data
 
         fig, ax = plt.subplots(figsize=(10, 6))
 
-        if sample_idx is None:
+        if feature_idx is None:
+            # Plot the entire DataFrame
             data.plot(ax=ax)
             ax.set_title("Stock Prices")
             ax.set_xlabel("Date")
             ax.set_ylabel("Price")
         else:
-            if sample_idx < 0 or sample_idx >= len(data):
-                raise IndexError("Sample index out of range.")
+            if feature_idx < 0 or feature_idx >= len(self.features.columns):
+                raise IndexError("Feature index out of range.")
+            
+            # Plot the associated feature-target on a timeseries scale.
 
-            sample_data = data.iloc[sample_idx]
-            sample_data.plot(ax=ax)
-            ax.set_title(f"Data for Sample Index {sample_idx}")
-            ax.set_xlabel("Feature")
+            # Get the name of the selected feature
+            feature_name = self.features.columns[feature_idx]
+
+            # Plot the selected feature
+            ax.plot(self.features.index, self.features.iloc[:, feature_idx], 
+                    label=feature_name, color='blue')
+
+            # Plot the target
+            target_name = self.labels.columns[0] 
+            ax.plot(self.labels.index, self.labels.iloc[:, 0], 
+                    label=f'Target ({target_name})', color='red', linestyle='--')
+
+            ax.set_title(f"Feature-Target Timeseries: {feature_name} vs {target_name}")
+            ax.set_xlabel("Date")
             ax.set_ylabel("Value")
+            ax.legend()
 
         ax.grid(True)
         return fig
