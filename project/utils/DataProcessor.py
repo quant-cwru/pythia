@@ -56,43 +56,36 @@ class DataProcessor:
         if self.labels is not None and col in self.labels.columns:
             self.labels.drop(columns=[col], inplace=True)
 
-    def plot(self, sample_idx = None):
-        """
-        Plots the input dataframe if no sample index is provided. Else plots the associated feature-target on a timeseries scale.
-        """
-        
+    def plot(self, sample_idx=None):
         if hasattr(self.data, "data_n"):
-            # Data is normalized, denormalize it
-            data = self.data.data_n
-            means = self.data.means
-            stds = self.data.stds
+            data = self.data.data_n.copy()
+            means = self.data.data.mean()
+            stds = self.data.data.std()
 
             for c in data.columns:
                 data[c] = data[c] * stds[c] + means[c]
         else:
-            # Data is unnormalized
             data = self.data.data
 
+        fig, ax = plt.subplots(figsize=(10, 6))
+
         if sample_idx is None:
-            # Plot the entire DataFrame
-            data.plot(figsize=(10, 6))
-            plt.title("Unnormalized Stock Prices")
-            plt.xlabel("Date")
-            plt.ylabel("Price")
-            plt.grid(True)
-            plt.show()
+            data.plot(ax=ax)
+            ax.set_title("Stock Prices")
+            ax.set_xlabel("Date")
+            ax.set_ylabel("Price")
         else:
-            if sample_idx < 0 or sample_idx >= len(self.data):
+            if sample_idx < 0 or sample_idx >= len(data):
                 raise IndexError("Sample index out of range.")
 
-            # Plot the feature-target pair for the specified sample index
             sample_data = data.iloc[sample_idx]
-            sample_data.plot(figsize=(10, 6))
-            plt.title(f"Unnormalized Data for Sample Index {sample_idx}")
-            plt.xlabel("Feature")
-            plt.ylabel("Value")
-            plt.grid(True)
-            plt.show()
+            sample_data.plot(ax=ax)
+            ax.set_title(f"Data for Sample Index {sample_idx}")
+            ax.set_xlabel("Feature")
+            ax.set_ylabel("Value")
+
+        ax.grid(True)
+        return fig
 
     def to_torch(self):
         """
@@ -116,5 +109,16 @@ class DataProcessor:
         return CustomTorchDataset(self.features, self.labels)
 
     def __getitem__(self, idx):
-        return self.data[idx]
+        if self.features is None or self.labels is None:
+            raise ValueError("Features and labels must be set before indexing.")
+        
+        return {
+            'features': self.features.iloc[idx],
+            'label': self.labels.iloc[idx]
+        }
+    
+    def __len__(self):
+        if self.features is None:
+            raise ValueError("Features must be set before getting length.")
+        return len(self.features)
         
