@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from torch.utils.data import Dataset
 import torch
-from project.data.datasets.timeseries.StockHistorical import StockHistorical
+from pythia.data.datasets.timeseries.StockHistorical import StockHistorical
 
 
 class DataProcessor:
@@ -135,6 +135,9 @@ class DataProcessor:
             'features': self.features.iloc[idx],
             'label': self.labels.iloc[idx]
         }
+    
+    def get_num_features(self):
+        return self.features.shape[1] if self.features is not None else 0
     
     def __len__(self):
         if self.features is None:
