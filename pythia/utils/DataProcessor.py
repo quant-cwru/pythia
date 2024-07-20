@@ -2,8 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from torch.utils.data import Dataset
 import torch
-from pythia.data.datasets.timeseries.StockHistorical import StockHistorical
-
+from pythia.datasets.TimeSeries import TimeSeries
 
 class DataProcessor:
     """
@@ -11,8 +10,8 @@ class DataProcessor:
     For now assume the input object is formatted exactly like data.datasets.timeseries.StockHistorical
     If data does not have the attribute data_n, then the data is unnormed.
     """
-    def __init__(self, data : StockHistorical):
-        self.data = data
+    def __init__(self, data : TimeSeries):
+        self.dataset = data
         self.features = None
         self.labels = None
     
@@ -20,20 +19,20 @@ class DataProcessor:
         """
         Takes in a list of columns identified by their name and creates the respective feature subset.
         """
-        if hasattr(self.data, "data_n"):
-            self.features = self.data.data_n[features]
+        if hasattr(self.dataset, "data_n"):
+            self.features = self.dataset.data_n[features]
         else:
-            self.features = self.data.data[features]
+            self.features = self.dataset.data[features]
     
     def set_labels(self, labels: list, shift=1):
         """
         Takes in a list of labels and creates the respective target subset.
         Since we are dealing with time-series data right now, the shift indicates how many timesteps ahead the labels are.
         """
-        if hasattr(self.data, "data_n"):
-            data = self.data.data_n
+        if hasattr(self.dataset, "data_n"):
+            data = self.dataset.data_n
         else:
-            data = self.data.data
+            data = self.dataset.data
 
         self.labels = data[labels].shift(-shift)
         
@@ -47,9 +46,9 @@ class DataProcessor:
         """
         Drops a column in the dataset. Should also drop the same column in its features and labels (if present).
         """
-        if hasattr(self.data, "data_n"):
-            self.data.data_n.drop(columns=[col], inplace=True)
-        self.data.data.drop(columns=[col], inplace=True)
+        if hasattr(self.dataset, "data_n"):
+            self.dataset.data_n.drop(columns=[col], inplace=True)
+        self.dataset.data.drop(columns=[col], inplace=True)
 
         if self.features is not None and col in self.features.columns:
             self.features.drop(columns=[col], inplace=True)
@@ -60,17 +59,17 @@ class DataProcessor:
         """
         Plots the input dataframe if no sample index is provided. Else plots the associated feature-target on a timeseries scale.
         """
-        if hasattr(self.data, "data_n"):
+        if hasattr(self.dataset, "data_n"):
             # Data is normalized, denormalize it
-            data = self.data.data_n.copy()
-            means = self.data.data.mean()
-            stds = self.data.data.std()
+            data = self.dataset.data_n.copy()
+            means = self.dataset.data.mean()
+            stds = self.dataset.data.std()
 
             for c in data.columns:
                 data[c] = data[c] * stds[c] + means[c]
         else:
             # Data is unnormalized
-            data = self.data.data
+            data = self.dataset.data
 
         fig, ax = plt.subplots(figsize=(10, 6))
 
@@ -143,4 +142,6 @@ class DataProcessor:
         if self.features is None:
             raise ValueError("Features must be set before getting length.")
         return len(self.features)
-        
+    
+    def __str__(self) -> str:
+        return f"DataProcessor containing {len(self.dataset.data.columns)}x{len(self.dataset.data)} samples"

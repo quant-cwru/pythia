@@ -1,9 +1,8 @@
 import yfinance as yf
 import pandas as pd
-import numpy as np
-from pythia.data.datasets.c_Dataset import c_Dataset
+from pythia.datasets.TimeSeries import TimeSeries 
 
-class StockHistorical(c_Dataset):
+class StockHistorical(TimeSeries):
     def __init__(self, ticker, start_date=None, end_date=None, interval='1d'):
         self.data : pd.DataFrame = yf.download(tickers=ticker, interval=interval, start=start_date, end=end_date)
     
