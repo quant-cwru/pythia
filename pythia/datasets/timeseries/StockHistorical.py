@@ -13,5 +13,3 @@ class StockHistorical(TimeSeries):
             std = self.data_n[c].std()
             self.data_n[c] = (self.data_n[c] - mean) / std
 
-
-

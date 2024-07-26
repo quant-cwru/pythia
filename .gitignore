@@ -10,3 +10,6 @@
 **/.idea
 *.ipynb
 
+# Testing directories
+testing/
+
