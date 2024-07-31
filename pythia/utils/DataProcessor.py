@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
-from torch.utils.data import Dataset
+from torch.utils.data import TensorDataset
 import torch
 from pythia.datasets.TimeSeries import TimeSeries
+import numpy as np
 
 class DataProcessor:
     """
@@ -12,6 +13,7 @@ class DataProcessor:
         dataset (TimeSeries): The input time series data.
         features (pd.DataFrame): Selected features for model input.
         labels (pd.DataFrame): Target variables for prediction.
+        sequence_length (int): Length of input sequences for LSTM models.
     """
  
     def __init__(self, data : TimeSeries):
@@ -24,7 +26,8 @@ class DataProcessor:
         self.dataset = data
         self.features = None
         self.labels = None
-    
+        self.sequence_length = None
+
     def set_features(self, features : list):
         """
         Takes in a list of columns identified by their name and creates the respective feature subset.
@@ -54,6 +57,26 @@ class DataProcessor:
         self.features = self.features[:-shift]
         self.labels = self.labels[:-shift].dropna()
         self.features = self.features.loc[self.labels.index]
+
+    def create_sequences(self, sequence_length):
+        """
+        Create sequences for LSTM input.
+
+        Args:
+            sequence_length (int): Length of each sequence.
+
+        Returns:
+            tuple: (sequences, labels) as numpy arrays.
+        """
+        self.sequence_length = sequence_length
+        sequences = []
+        labels = []
+        for i in range(len(self.features) - sequence_length):
+            seq = self.features.iloc[i:i+sequence_length].values
+            label = self.labels.iloc[i+sequence_length].values
+            sequences.append(seq)
+            labels.append(label)
+        return np.array(sequences), np.array(labels)
 
     def drop(self, col: str):
         """
@@ -126,27 +149,22 @@ class DataProcessor:
 
         ax.grid(True)
         return fig
-
-    def to_torch(self):
+    
+    def to_torch(self, is_lstm=False):
         """
-        Returns a torch dataset (in tensors) from the corresponding features and labels.
-        
+        Convert the data to PyTorch tensors.
+
+        Args:
+            is_lstm (bool): Whether to create sequences for LSTM input.
+
         Returns:
-            CustomTorchDataset: A PyTorch Dataset containing the features and labels.
+            TensorDataset: A PyTorch dataset containing the features and labels.
         """
-        # Custom torch class
-        class CustomTorchDataset(Dataset):
-            def __init__(self, features, labels):
-                self.features = torch.tensor(features.values, dtype=torch.float32)
-                self.labels = torch.tensor(labels.values, dtype=torch.float32)
-
-            def __len__(self):
-                return len(self.features)
-
-            def __getitem__(self, idx):
-                return self.features[idx], self.labels[idx]
-
-        return CustomTorchDataset(self.features, self.labels)
+        if is_lstm:
+            X, y = self.create_sequences(self.sequence_length)
+            return TensorDataset(torch.FloatTensor(X), torch.FloatTensor(y))
+        else:
+            return TensorDataset(torch.FloatTensor(self.features.values), torch.FloatTensor(self.labels.values))
 
     def __getitem__(self, idx):
         """

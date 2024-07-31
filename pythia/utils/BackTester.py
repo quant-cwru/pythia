@@ -15,6 +15,9 @@ class Backtester:
         transaction_cost (float): The fixed transaction cost per trade.
         model (nn.Module): The trained PyTorch model.
         data_processor (DataProcessor): The data processing object.
+        device (str): The device to run the model on ('cuda' or 'cpu').
+        is_lstm (bool): Whether the model is an LSTM.
+        sequence_length (int): The input sequence length for LSTM models.
         backtest_features (pd.DataFrame): Features for backtesting.
         backtest_labels (pd.DataFrame): Labels for backtesting.
     """
@@ -33,6 +36,9 @@ class Backtester:
         self.transaction_cost = transaction_cost
         self.model = trainer.model
         self.data_processor = trainer.data_processor
+        self.device = trainer.device
+        self.is_lstm = trainer.is_lstm
+        self.sequence_length = trainer.hyperparams.get('sequence_length', 10)
         
         self.split_data()
     
@@ -57,7 +63,7 @@ class Backtester:
         self.model.eval()
         
         actual_returns = self.backtest_labels.pct_change().dropna()
-        model_returns, trade_count, positions = self.calculate_model_returns(actual_returns)
+        model_returns, trade_count, positions, predictions, prediction_changes = self.calculate_model_returns(actual_returns)
         buy_hold_returns = actual_returns.squeeze()
         
         if len(model_returns) == 0 or len(buy_hold_returns) == 0:
@@ -70,6 +76,8 @@ class Backtester:
         model_returns = model_returns.loc[common_index]
         buy_hold_returns = buy_hold_returns.loc[common_index]
         positions = positions.loc[common_index]
+        predictions = predictions.loc[common_index]
+        prediction_changes = prediction_changes.loc[common_index]
         
         cum_model_returns = (1 + model_returns).cumprod()
         cum_buy_hold_returns = (1 + buy_hold_returns).cumprod()
@@ -82,7 +90,10 @@ class Backtester:
             'cum_model_returns': cum_model_returns,
             'cum_buy_hold_returns': cum_buy_hold_returns,
             'total_trades': trade_count,
-            'positions': positions
+            'positions': positions,
+            'predictions': predictions,
+            'prediction_changes': prediction_changes,
+            'actual_returns': actual_returns
         }
     
     def _get_predictions(self) -> pd.Series:
@@ -93,12 +104,21 @@ class Backtester:
             pd.Series: A series of predictions.
         """
         predictions = []
+        self.model.eval()
         with torch.no_grad():
-            for features in self.backtest_features.values:
-                prediction = self.model(torch.FloatTensor(features)).item()
-                predictions.append(prediction)
+            if self.is_lstm:
+                for i in range(len(self.backtest_features) - self.sequence_length + 1):
+                    sequence = self.backtest_features.iloc[i:i+self.sequence_length].values
+                    sequence = torch.FloatTensor(sequence).unsqueeze(0).to(self.device)  # Add batch dimension
+                    prediction = self.model(sequence).squeeze().item()
+                    predictions.append(prediction)
+            else:
+                for features in self.backtest_features.values:
+                    features = torch.FloatTensor(features).unsqueeze(0).to(self.device)  # Add batch dimension
+                    prediction = self.model(features).squeeze().item()
+                    predictions.append(prediction)
         
-        return pd.Series(predictions, index=self.backtest_features.index)
+        return pd.Series(predictions, index=self.backtest_features.index[-len(predictions):])
     
     def calculate_model_returns(self, actual_returns: pd.Series) -> tuple:
         """
@@ -108,7 +128,7 @@ class Backtester:
             actual_returns (pd.Series): The actual returns of the asset.
 
         Returns:
-            tuple: (pd.Series of model returns, int number of trades, pd.Series of positions)
+            tuple: (pd.Series model_returns, int trade_count, pd.Series positions, pd.Series predictions, pd.Series prediction_changes)
         """
         predictions = self._get_predictions()
         
@@ -117,11 +137,12 @@ class Backtester:
         predictions = predictions.loc[common_index]
         actual_returns = actual_returns.loc[common_index].squeeze()
         
-        confidence = predictions.pct_change()
+        # Calculate the percentage change of predictions
+        prediction_changes = predictions.pct_change()
 
         # If above threshold, go long (1), if below negative threshold, go short (-1), otherwise hold cash (0)
-        positions = pd.Series(np.where(confidence.abs() > self.threshold, np.sign(confidence), 0), index=common_index)
-        
+        positions = pd.Series(np.where(prediction_changes.abs() > self.threshold, np.sign(prediction_changes), 0), index=common_index)
+    
         # Calculate trades (position changes)
         trades = positions.diff().abs()
         trade_count = trades.sum()
@@ -133,7 +154,7 @@ class Backtester:
         model_returns = positions.shift(1) * actual_returns - transaction_costs
         model_returns = model_returns.dropna()
         
-        return model_returns, trade_count, positions
+        return model_returns, trade_count, positions, predictions, prediction_changes
     
     def calculate_sharpe_ratio(self, returns: pd.Series) -> float:
         """
@@ -178,21 +199,26 @@ class Backtester:
             print("Not enough data to plot results.")
             return
         
-        plt.figure(figsize=(12, 6))
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
         
-        # Plot buy and hold strategy
-        plt.plot(results['cum_buy_hold_returns'], label='Buy and Hold', color='blue', linewidth=2)
-        
-        # Plot model strategy, green for long, red for short, black for cash
-        cum_returns = results['cum_model_returns']
-        positions = results['positions']
-        
-        for i in range(1, len(cum_returns)):
-            color = 'green' if positions.iloc[i-1] > 0 else ('red' if positions.iloc[i-1] < 0 else 'black')
-            plt.plot(cum_returns.index[i-1:i+1], cum_returns.iloc[i-1:i+1], color=color, linewidth=2)
-        
-        plt.title('Model Performance vs Buy and Hold')
-        plt.xlabel('Date')
-        plt.ylabel('Cumulative Returns')
-        plt.legend(['Buy and Hold', 'Model Strategy (Short)', 'Model Strategy (Long)'])
+        # Plot cumulative returns
+        ax1.plot(results['cum_buy_hold_returns'], label='Buy and Hold', color='blue', linewidth=2)
+        ax1.plot(results['cum_model_returns'], label='Model Strategy', color='green', linewidth=2)
+        ax1.set_title('Cumulative Returns: Model vs Buy and Hold')
+        ax1.set_xlabel('Date')
+        ax1.set_ylabel('Cumulative Returns')
+        ax1.legend()
+        ax1.grid(True)
+    
+        # Plot prediction changes
+        ax2.plot(results['prediction_changes'].index, results['prediction_changes'], label='Prediction Changes', color='purple', linewidth=1)
+        ax2.set_title('Prediction Changes and Positions')
+        ax2.set_xlabel('Date')
+        ax2.set_ylabel('Prediction Change')
+        ax2.legend(loc='upper left')
+        ax2.grid(True)
+
+        ax2.legend(loc='upper left')
+
+        plt.tight_layout()
         plt.show()

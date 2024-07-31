@@ -50,6 +50,7 @@ class Trainer:
         
         # Get hyperparameters from model editor
         self.hyperparams = self.model_editor.get_hyperparams(model_name)
+        self.is_lstm = isinstance(self.model, nn.LSTM)
         
     def setup_training(self):
         """
@@ -87,6 +88,10 @@ class Trainer:
         elif scheduler_name is not None:
             raise ValueError(f"Unsupported scheduler: {scheduler_name}")
         
+        # Set up lstm
+        if self.is_lstm:
+            self.sequence_length = self.hyperparams.get('sequence_length', 10)
+            self.data_processor.sequence_length = self.sequence_length 
     def train(self):
         """
         Execute the training loop for the model.
@@ -106,7 +111,7 @@ class Trainer:
         snapshot_interval = self.hyperparams.get('snapshot_interval', 5)
         
         # Prepare datasets and dataloaders
-        dataset = self.data_processor.to_torch()
+        dataset = self.data_processor.to_torch(is_lstm=self.is_lstm)    
         train_size = int((1 - validation_split) * len(dataset))
         train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, len(dataset) - train_size])
         
@@ -141,7 +146,7 @@ class Trainer:
                     inputs, targets = inputs.to(self.device), targets.to(self.device)
                     
                     outputs = self.model(inputs)
-                    loss = self.criterion(outputs, targets)
+                    loss = self.criterion(outputs, targets.squeeze())
                     
                     val_loss += loss.item()
             
