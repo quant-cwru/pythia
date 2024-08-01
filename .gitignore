@@ -10,7 +10,9 @@
 **/.idea
 *.ipynb
 
+# Snapshot directory
+snapshots/
+
 # Testing directories
 testing/
-snapshots/
 
