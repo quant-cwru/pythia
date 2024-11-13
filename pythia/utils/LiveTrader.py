@@ -134,6 +134,8 @@ class LiveTrader:
         signal = self.get_trading_signal(ticker)
         predicted_move = self.predict_next_move(ticker)
         current_price = self.get_latest_data(ticker).data['Close'].iloc[-1]
+        predicted_change = predicted_move / current_price * 100
+
         
         if signal == 1:
             action = "BUY"
@@ -141,12 +143,12 @@ class LiveTrader:
             action = "SELL"
         else:
             action = "HOLD"
-        
+
         print(f"Live Trading Signal for {ticker}:")
         print(f"Current Price: ${current_price:.2f}")
         print(f"Action: {action}")
         print(f"Predicted Move: ${predicted_move:.2f}")
         print(f"Predicted Price: ${(current_price + predicted_move):.2f}")
-        print(f"Predicted Change: {(predicted_move / current_price * 100):.2f}%")
+        print(f"Predicted Change: {predicted_change:.2f}%")
 
-        return action, predicted_move
+        return action, predicted_change

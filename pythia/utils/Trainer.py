@@ -164,7 +164,7 @@ class Trainer:
                 self.save_snapshot(f"snapshot_{self.model_name}_epoch_{epoch+1}.pth")
         
         # Plot loss curves after training
-        self.plot_loss()
+        # self.plot_loss()
     
     def plot_loss(self):
         """
