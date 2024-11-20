@@ -87,16 +87,17 @@ class LiveTrader:
         self.model.eval()
         with torch.no_grad():
             prediction = self.model(latest_data)
+            prediction = prediction.float().item()
 
         # Denormalize the prediction using the StockHistorical class method
-        close_mean = stock_data.data['Close'].mean()
-        close_std = stock_data.data['Close'].std()
+        close_mean = float(stock_data.data['Close'].mean())
+        close_std = float(stock_data.data['Close'].std())
         denormalized_prediction = prediction * close_std + close_mean
         
-        current_price = stock_data.data['Close'].iloc[-1]
+        current_price = float(stock_data.data['Close'].iloc[-1])
         predicted_move = denormalized_prediction - current_price
 
-        return predicted_move
+        return float(predicted_move)  
 
     def get_trading_signal(self, ticker: str) -> int:
         """
@@ -109,10 +110,10 @@ class LiveTrader:
             int: The trading signal (1 for Buy, -1 for Sell, 0 for Hold).
         """
         predicted_move = self.predict_next_move(ticker)
-        current_price = self.get_latest_data(ticker).data['Close'].iloc[-1]
+        current_price = float(self.get_latest_data(ticker).data['Close'].iloc[-1])  
         
         # Use percentage change for threshold comparison
-        percentage_change = predicted_move / current_price
+        percentage_change = float(predicted_move) / current_price  
         
         if percentage_change > self.threshold:
             return 1  # Buy 
@@ -133,10 +134,8 @@ class LiveTrader:
         """
         signal = self.get_trading_signal(ticker)
         predicted_move = self.predict_next_move(ticker)
-        current_price = self.get_latest_data(ticker).data['Close'].iloc[-1]
+        current_price = float(self.get_latest_data(ticker).data['Close'].iloc[-1])
         predicted_change = predicted_move / current_price * 100
-
-        
         if signal == 1:
             action = "BUY"
         elif signal == -1:
@@ -151,4 +150,4 @@ class LiveTrader:
         print(f"Predicted Price: ${(current_price + predicted_move):.2f}")
         print(f"Predicted Change: {predicted_change:.2f}%")
 
-        return action, predicted_change
+        return action, float(predicted_change)
