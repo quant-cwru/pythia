@@ -1,8 +1,28 @@
 import React, { useState, useEffect } from 'react'
 import Settings from '../../images/Union.png'
 import { Helmet } from 'react-helmet'
-import graph from '../../images/stock.png'
+import { Line } from 'react-chartjs-2'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+} from 'chart.js'
 import './data.css'
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+)
 
 const Data = (props) => {
   const[ModelActive, setModelActive] = useState(0);
@@ -36,6 +56,7 @@ const Data = (props) => {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [chartData, setChartData] = useState(null);
 
   useEffect(() => {
     setModelActive(1);
@@ -172,6 +193,25 @@ const Data = (props) => {
       const data = await response.json();
       console.log('Backtest results:', data);
       setResults(data);
+
+      setChartData({
+        labels: data.dates,
+        datasets: [
+          {
+            label: 'Model Returns',
+            data: data.cumulative_returns_model,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1
+          },
+          {
+            label: 'Buy & Hold Returns',
+            data: data.cumulative_returns_buy_hold,
+            borderColor: 'rgb(255, 99, 132)',
+            tension: 0.1
+          }
+        ]
+      });
+
     } catch (err) {
       console.error('Backtest error:', err);
       setError(err.message);
@@ -438,14 +478,6 @@ const Data = (props) => {
 
       </div>
 
-      <div className="data-rectangle8">
-
-      </div>
-
-      <span className="data-text48 M3bodylarge">
-        <span>Explain and Tips on Hover?</span>
-      </span>
-
       <div className="Model_Choice" style={{zIndex:ModelActive}}>
         <span className="Model-Header">
           <span>Model Choices</span>
@@ -545,54 +577,124 @@ const Data = (props) => {
         </div>
       </div>
 
-      <img src={graph} className="graph-settings" style={{zIndex:ResultsActive*1000}} alt="graph" />
+      <div className="graph-settings" style={{zIndex:ResultsActive*1000}}>
+        {chartData ? (
+          <Line
+            data={{
+              ...chartData,
+              datasets: chartData.datasets.map(dataset => ({
+                ...dataset,
+                backgroundColor: 'white'
+              }))
+            }}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                title: {
+                  display: true,
+                  text: `${formData.ticker} - Model vs Buy & Hold Returns`
+                },
+                legend: {
+                  position: 'top'
+                }
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  title: {
+                    display: true,
+                    text: 'Cumulative Returns'
+                  },
+                  grid: {
+                    color: '#E5E5E5'
+                  },
+                  ticks: {
+                    callback: value => `${(value * 100).toFixed(0)}%`
+                  }
+                },
+                x: {
+                  title: {
+                    display: true,
+                    text: 'Date'
+                  },
+                  grid: {
+                    color: '#E5E5E5'
+                  }
+                }
+              },
+              layout: {
+                padding: 20
+              },
+              backgroundColor: 'white',
+              elements: {
+                line: {
+                  borderWidth: 2
+                }
+              }
+            }}
+          />
+        ) : (
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100%',
+            fontSize: '1.2em',
+            color: '#666'
+          }}>
+            Run backtest to view performance comparison
+          </div>
+        )}
+      </div>
 
       <div className="Column_2" style={{zIndex:ResultsActive}}>
         <div className="results-page">
           <span className="ticker-1">
             {formData.ticker || 'Ticker 1'}
           </span>
-          {results && (
-            <ul>
-              <li>Sharpe Ratio: {results.sharpe_ratio_model?.toFixed(2)}</li>
-              <li>Max Drawdown: {(results.max_drawdown_model * 100).toFixed(2)}%</li>
-              <li>Total Trades: {results.total_trades}</li>
-              <li>Current Action: {results.action}</li>
-              <li>Predicted Move: {(results.predicted_percent_change * 100).toFixed(2)}%</li>
-            </ul>
-          )}
-          <div className="generate-button" onClick={runBacktest}>
-            <span className="generate-text">
-              Run Backtest
-            </span>
-          </div>
-          <div className="generate-table" onClick={getPredictions}>
-            <span className="generate-text">
-              Get Prediction
-            </span>
-          </div>
-        </div>
-
-        <div className="results-page2">
-          <span className="ticker-1">
-            Ticker 1
-          </span>
-          <ul>
-            <li>Dates</li>
-            <li>Models</li>
-            <li>List item</li>
-            <li>List item</li>
-            <li>List item</li>
-          </ul>
-          <div className="generate-button">
-            <span className="generate-text">
-              Generate Graph
-            </span>
-          </div>
-          <div className="generate-table">
-            <span className="generate-text">
-              Generate Table
-            </span>
+          <div className="stats-container">
+            {results && (
+              <>
+                <div className="stat-item">
+                  <div className="stat-label">Sharpe Ratio</div>
+                  <div className="stat-value">{results.sharpe_ratio_model?.toFixed(2)}</div>
+                </div>
+                <div className="stat-item">
+                  <div className="stat-label">Max Drawdown</div>
+                  <div className="stat-value">{(results.max_drawdown_model * 100).toFixed(2)}%</div>
+                </div>
+                <div className="stat-item">
+                  <div className="stat-label">Total Trades</div>
+                  <div className="stat-value">{results.total_trades}</div>
+                </div>
+                <div className="stat-item">
+                  <div className="stat-label">Current Action</div>
+                  <div className="stat-value" style={{
+                    color: results.action === 'BUY' ? '#4CAF50' : 
+                           results.action === 'SELL' ? '#f44336' : '#666'
+                  }}>
+                    {results.action}
+                  </div>
+                </div>
+                <div className="stat-item">
+                  <div className="stat-label">Predicted Move</div>
+                  <div className="stat-value" style={{
+                    color: results.predicted_percent_change >= 0 ? '#4CAF50' : '#f44336'
+                  }}>
+                    {(results.predicted_percent_change * 100).toFixed(2)}%
+                  </div>
+                </div>
+              </>
+            )}
+            <div className="action-buttons">
+              <div className="stat-item action-button" onClick={runBacktest}>
+                <span className="stat-value">Run Backtest</span>
+              </div>
+              <div className="stat-item action-button" onClick={getPredictions}>
+                <span className="stat-value">Get Prediction</span>
+              </div>
+            </div>
           </div>
         </div>
 

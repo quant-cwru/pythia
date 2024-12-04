@@ -113,7 +113,7 @@ span{
     flex-direction:column;
   }
   .data-text20 {
-    color: rgba(30, 30, 30, 1);
+    color: white;
     height: auto;
     align-self: stretch;
     text-align: left;
@@ -150,7 +150,7 @@ span{
     flex-direction: column;
   }
   .data-text22 {
-    color: rgba(30, 30, 30, 1);
+    color: white;
     height: auto;
     align-self: stretch;
     text-align: left;
@@ -167,7 +167,7 @@ span{
     flex-direction: column;
   }
   .data-text24 {
-    color: rgba(30, 30, 30, 1);
+    color: white;
     height: auto;
     align-self: stretch;
     text-align: left;
@@ -184,7 +184,7 @@ span{
     flex-direction: column;
   }
   .data-text26 {
-    color: rgba(30, 30, 30, 1);
+    color: white;
     height: auto;
     align-self: stretch;
     text-align: left;
@@ -201,7 +201,7 @@ span{
     flex-direction: column;
   }
   .data-text28 {
-    color: rgba(30, 30, 30, 1);
+    color: white;
     height: auto;
     align-self: stretch;
     text-align: left;
@@ -218,7 +218,7 @@ span{
     flex-direction: column;
   }
   .data-text30 {
-    color: rgba(30, 30, 30, 1);
+    color: white;
     height: auto;
     align-self: stretch;
     text-align: left;
@@ -255,7 +255,7 @@ span{
     flex-direction: column;
   }
   .data-text34 {
-    color: rgba(30, 30, 30, 1);
+    color: white;
     height: auto;
     align-self: stretch;
     text-align: left;
@@ -272,7 +272,7 @@ span{
     flex-direction: column;
   }
   .data-text36 {
-    color: rgba(30, 30, 30, 1);
+    color: white;
     height: auto;
     align-self: stretch;
     text-align: left;
@@ -289,7 +289,7 @@ span{
     flex-direction: column;
   }
   .data-text38 {
-    color: rgba(30, 30, 30, 1);
+    color: white;
     height: auto;
     align-self: stretch;
     text-align: left;
@@ -306,7 +306,7 @@ span{
     flex-direction: column;
   }
   .data-text40 {
-    color: rgba(30, 30, 30, 1);
+    color: white;
     height: auto;
     align-self: stretch;
     text-align: left;
@@ -323,7 +323,7 @@ span{
     flex-direction: column;
   }
   .data-text42 {
-    color: rgba(30, 30, 30, 1);
+    color: white;
     height: auto;
     align-self: stretch;
     text-align: left;
@@ -340,7 +340,7 @@ span{
     flex-direction: column;
   }
   .data-text44 {
-    color: rgba(30, 30, 30, 1);
+    color: white;
     height: auto;
     align-self: stretch;
     text-align: left;
@@ -377,16 +377,23 @@ span{
     border-width: 2px;
     border-radius: 8px;
   }
-  .generate-button{
+  .generate-button {
     top: 230px;
     right: 145px;
     width: 125px;
     height: 40px;
-    border-radius:10px;
+    border-radius: 10px;
     position: absolute;
-    background-color:black;
+    background-color: black;
     align-items: center;
     align-content: center;
+  }
+
+  .generate-text {
+    right: 15px;
+    top: 10px;
+    position: absolute;
+    color: white;
   }
   .graph-settings{
     left:720px;
@@ -396,6 +403,7 @@ span{
     position:absolute;
     border-width: 0 5px;
     border: solid #000;
+    background-color: white;
   }
   .generate-table{
     top: 230px;
@@ -436,26 +444,15 @@ span{
     z-index:101;
   }
   .results-page {
-    top:90px;
+    top: 90px;
     left: 30px;
     width: 280px;
-    height: 290px;
-    border-radius:5px;
+    height: auto;
+    border-radius: 8px;
     position: absolute;
-    background-color:white;
-    align-items: center;
-    align-content: center;
-  }
-  .results-page2 {
-    top:425px;
-    left: 30px;
-    width: 280px;
-    height: 300px;
-    border-radius:5px;
-    position: absolute;
-    background-color:white;
-    align-items: center;
-    align-content: center;
+    background-color: white;
+    padding-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
   .data-text48 {
     top: 258px;
@@ -488,3 +485,149 @@ span{
     line-height: 24px;
     z-index:2;
   }
+  .stats-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+    margin-top: 60px;
+  }
+
+  .stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+  }
+
+  .action-buttons {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .action-button {
+    cursor: pointer;
+    justify-content: center;
+    background-color: #f8f9fa;
+  }
+
+  .action-button:hover {
+    background-color: #e9ecef;
+    transform: translateY(-1px);
+  }
+
+  .action-button .stat-value {
+    color: #2F4E6D;
+    font-weight: 600;
+  }
+
+  .stat-label {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+  }
+
+  .stat-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .ticker-1 {
+    font-size: 22px;
+    font-weight: bold;
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: #2F4E6D;
+  }
+
+  .data-input-field10, 
+  .data-input-field11, 
+  .data-input-field12, 
+  .data-input-field13, 
+  .data-input-field14, 
+  .data-input-field15,
+  .data-input-field16,
+  .data-input-field17,
+  .data-input-field18,
+  .data-input-field19,
+  .data-input-field20,
+  .data-input-field21 {
+    gap: 8px;
+    width: 225px;
+    display: flex;
+    position: absolute;
+    left: 35px;
+    flex-direction: column;
+  }
+
+  .data-input10 {
+    color: #333;
+    padding: 12px 16px;
+    font-size: 14px;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    height: auto;
+    width: calc(100% - 32px);
+    transition: all 0.2s ease;
+  }
+
+  .data-input10:focus {
+    outline: none;
+    border-color: #2F4E6D;
+    box-shadow: 0 0 0 2px rgba(47, 78, 109, 0.1);
+  }
+
+  .data-text20,
+  .data-text22,
+  .data-text24,
+  .data-text26,
+  .data-text28,
+  .data-text30,
+  .data-text34,
+  .data-text36,
+  .data-text38,
+  .data-text40,
+  .data-text42,
+  .data-text44 {
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  select.data-input10 {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+  }
+
+  input[type="date"].data-input10 {
+    padding-right: 16px;
+  }
+
+  .data-input-field10 { top: 178px; }
+  .data-input-field11 { top: 268px; }
+  .data-input-field12 { top: 358px; }
+  .data-input-field13 { top: 448px; }
+  .data-input-field14 { top: 538px; }
+  .data-input-field15 { top: 88px; }
+  .data-input-field16 { top: 200px; }
+  .data-input-field17 { top: 290px; }
+  .data-input-field18 { top: 380px; }
+  .data-input-field19 { top: 470px; }
+  .data-input-field20 { top: 560px; }
+  .data-input-field21 { top: 110px; }
