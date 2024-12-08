@@ -98,9 +98,7 @@ function LiveTrading(){
           <input type="text" placeholder="Value" className="data-input10" />
         </div>
         </div>
-        <span className="data-text32 M3bodylarge" style = {{zIndex:DataActive}}>
-          <span>Data choices</span>
-        </span>
+          <span className = "data-text32" style = {{zIndex:DataActive}}>Data choices</span>
         <div className = "Column_3" style = {{zIndex:(ModelActive*200)}}>
         <div className="data-input-field16">
           <span className="data-text34 BodyBase">
@@ -143,9 +141,7 @@ function LiveTrading(){
           </span>
           <input type="text" placeholder="Value" className="data-input10" />
         </div>
-        <span className="data-text46 M3bodylarge">
-          <span>Data Scaling and Imputation</span>
-        </span>
+          <span className="data-text46 M3bodylarge">Data Scaling and Imputation</span>
         </div>
         <div className = "Column_4">
 
@@ -157,9 +153,7 @@ function LiveTrading(){
           <span>Explain and Tips on Hover?</span>
         </span>
         <div className = "Model_Choice"style = {{zIndex:ModelActive}}>
-        <span className="Model-Header">
-          <span>Model Choices</span>
-        </span>
+          <span className = "Model-Header">Model Choices</span>
         <div className="data-input-field10">
           <span className="data-text20 BodyBase">
             <span>HyperParam 1</span>
@@ -243,9 +237,7 @@ function LiveTrading(){
           </span>
         </div>
         </div>
-        <span className="Results-Header" style = {{zIndex:ResultsActive}}>
-          <span>Summary</span>
-        </span>
+          <span className="Results-Header" style = {{zIndex:ResultsActive}}>Summary</span>
         </div>
       </div>
   )
