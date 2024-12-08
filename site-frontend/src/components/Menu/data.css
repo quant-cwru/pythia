@@ -233,14 +233,14 @@ span{
   }
   .data-text32 {
     top: 40px;
-    left: 215px;
+    left: 275px;
     color: rgba(0, 0, 0, 1);
     height: auto;
     position: absolute;
     text-align: left;
     line-height: 24px;
     z-index:2;
-    font-size: 20px !important;
+    font-size: 23px !important;
   }
   .data-Model {
     top: 37px;
@@ -484,7 +484,7 @@ span{
   }
   .Model-Header{
     top: 40px;
-    left: 35px;
+    left: 90px;
     color: rgba(0, 0, 0, 1);
     height: auto;
     position: absolute;
@@ -495,12 +495,12 @@ span{
   }
   .Results-Header{
     top: 40px;
-    left: 40px;
+    left: 120px;
     color: rgba(0, 0, 0, 1);
     height: auto;
     position: absolute;
     text-align: left;
     line-height: 24px;
     z-index:2;
-    font-size:20px !important;
+    font-size:23px !important;
   }
