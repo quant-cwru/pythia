@@ -30,7 +30,7 @@ span{
     height: 839px;
     position: absolute;
     background-color:white;
-    border-width: 0 1px;
+    border-width: 10px;
     border: solid #2F4E6D;
   }
   .label_size {
@@ -50,7 +50,7 @@ span{
     flex-shrink: 0;
     border-radius: 4px;
     background-color:#A0BDE0;
-    border-width: 0 1px;
+    border-width: 10px;
     border: solid #000;
   }
   .data-menulist {
@@ -99,7 +99,7 @@ span{
     height: 0px;
     position: absolute;
     box-sizing: content-box;
-    background-color:#A0BDE0;
+    background-color:white;
   }
   .data-input-field10 {
     gap: 8px;
@@ -226,13 +226,15 @@ span{
   }
   .data-text32 {
     top: 40px;
-    left: 215px;
+    left: 280px;
     color: rgba(0, 0, 0, 1);
     height: auto;
     position: absolute;
     text-align: left;
+    align-content: left;
     line-height: 24px;
     z-index:2;
+    font-size: 25px;
   }
   .data-Model {
     top: 37px;
@@ -347,13 +349,14 @@ span{
     line-height: 139.9999976158142%;
   }
   .data-text46 {
-    top: 60px;
-    left: 35px;
+    top: 70px;
+    left: 20px;
     color: rgba(0, 0, 0, 1);
     height: auto;
     position: absolute;
     text-align: left;
     line-height: 24px;
+    font-size:21px;
   }
   .Column_4{
     top: 0px;
@@ -374,12 +377,12 @@ span{
     align-items: center;
     align-content: center;
     z-index:101;
-    border-width: 2px;
+    border-width: medium;
     border-radius: 8px;
   }
   .generate-button {
     top: 230px;
-    right: 145px;
+    right: 120px;
     width: 125px;
     height: 40px;
     border-radius: 10px;
@@ -390,7 +393,7 @@ span{
   }
 
   .generate-text {
-    right: 15px;
+    right: 25px !important;
     top: 10px;
     position: absolute;
     color: white;
@@ -401,7 +404,7 @@ span{
     height:600px;
     width:600px;
     position:absolute;
-    border-width: 0 5px;
+    border-width: medium;
     border: solid #000;
     background-color: white;
   }
@@ -466,23 +469,25 @@ span{
     z-index:102;
   }
   .Model-Header{
-    top: 40px;
-    left: 35px;
+    top: 50px;
+    left: 90px;
     color: rgba(0, 0, 0, 1);
     height: auto;
     position: absolute;
     text-align: left;
     line-height: 24px;
+    font-size:23px;
     z-index:2;
   }
   .Results-Header{
     top: 40px;
-    left: 40px;
+    left: 120px;
     color: rgba(0, 0, 0, 1);
     height: auto;
     position: absolute;
     text-align: left;
     line-height: 24px;
+    font-size:23px;
     z-index:2;
   }
   .stats-container {
@@ -503,7 +508,13 @@ span{
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     transition: all 0.2s ease;
   }
-
+  .menu-items{
+    justify-content: space-between;
+    align-items: center;
+    background-color: #A0BDE0 !important;
+    width:140px;
+    transition: all 0.1s ease;
+  }
   .action-buttons {
     margin-top: 10px;
     display: flex;
